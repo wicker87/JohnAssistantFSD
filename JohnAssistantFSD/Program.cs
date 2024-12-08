@@ -1,10 +1,40 @@
-using JohnAssistantFSD.Components;
+﻿using JohnAssistantFSD.Components;
+using JohnAssistantFSD.Components.Account;
+using JohnAssistantFSD.Data;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("JohnAssistantFSDContext") ?? throw new InvalidOperationException("Connection string 'JohnAssistantFSDContext' not found.");;
+
+builder.Services.AddDbContext<JohnAssistantFSDContext>(options => options.UseSqlServer(connectionString));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddCascadingAuthenticationState();
+
+builder.Services.AddScoped<IdentityUserAccessor>();
+
+builder.Services.AddScoped<IdentityRedirectManager>();
+
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
+
+builder.Services.AddIdentityCore<JohnAssistantFSDUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<JohnAssistantFSDContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<JohnAssistantFSDUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
 
@@ -23,5 +53,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapAdditionalIdentityEndpoints();;
 
 app.Run();

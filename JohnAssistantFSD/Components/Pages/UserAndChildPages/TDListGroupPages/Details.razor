@@ -1,0 +1,56 @@
+﻿@page "/tdlistgroups/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>TDListGroup</h2>
+    <hr />
+    @if (tdlistgroup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ToDoListId</dt>
+            <dd class="col-sm-10">@tdlistgroup.ToDoListId</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@tdlistgroup.UserId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@tdlistgroup.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@tdlistgroup.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@tdlistgroup.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@tdlistgroup.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/tdlistgroups/edit?id={tdlistgroup.Id}")">Edit</a> |
+            <a href="@($"/tdlistgroups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private TDListGroup? tdlistgroup;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        tdlistgroup = await context.TDListGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (tdlistgroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,124 @@
+﻿@page "/shoppinglists/edit"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>ShoppingList</h2>
+<hr />
+@if (ShoppingList is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="ShoppingList" OnValidSubmit="UpdateShoppingList" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="ShoppingList.Id" value="@ShoppingList.Id" />
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content:</label>
+                    <InputText id="content" @bind-Value="ShoppingList.Content" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.Content" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <InputNumber id="amount" @bind-Value="ShoppingList.Amount" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.Amount" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="cost" class="form-label">Cost:</label>
+                    <InputNumber id="cost" @bind-Value="ShoppingList.Cost" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.Cost" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="bought" class="form-label">Bought:</label>
+                    <InputCheckbox id="bought" @bind-Value="ShoppingList.Bought" class="form-check-input" />
+                    <ValidationMessage For="() => ShoppingList.Bought" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="ShoppingList.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="ShoppingList.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="ShoppingList.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="ShoppingList.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => ShoppingList.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/shoppinglists">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ShoppingList? ShoppingList { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ShoppingList ??= await context.ShoppingList.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ShoppingList is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateShoppingList()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(ShoppingList!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ShoppingListExists(ShoppingList!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/shoppinglists");
+    }
+
+    private bool ShoppingListExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.ShoppingList.Any(e => e.Id == id);
+    }
+}

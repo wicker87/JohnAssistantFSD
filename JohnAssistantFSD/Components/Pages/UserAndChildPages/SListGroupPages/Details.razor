@@ -1,0 +1,56 @@
+﻿@page "/slistgroups/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>SListGroup</h2>
+    <hr />
+    @if (slistgroup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ShoppingListId</dt>
+            <dd class="col-sm-10">@slistgroup.ShoppingListId</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@slistgroup.UserId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@slistgroup.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@slistgroup.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@slistgroup.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@slistgroup.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/slistgroups/edit?id={slistgroup.Id}")">Edit</a> |
+            <a href="@($"/slistgroups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private SListGroup? slistgroup;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        slistgroup = await context.SListGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (slistgroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

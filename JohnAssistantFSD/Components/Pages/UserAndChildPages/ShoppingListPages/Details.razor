@@ -1,0 +1,60 @@
+﻿@page "/shoppinglists/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ShoppingList</h2>
+    <hr />
+    @if (shoppinglist is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Content</dt>
+            <dd class="col-sm-10">@shoppinglist.Content</dd>
+            <dt class="col-sm-2">Amount</dt>
+            <dd class="col-sm-10">@shoppinglist.Amount</dd>
+            <dt class="col-sm-2">Cost</dt>
+            <dd class="col-sm-10">@shoppinglist.Cost</dd>
+            <dt class="col-sm-2">Bought</dt>
+            <dd class="col-sm-10">@shoppinglist.Bought</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@shoppinglist.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@shoppinglist.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@shoppinglist.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@shoppinglist.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/shoppinglists/edit?id={shoppinglist.Id}")">Edit</a> |
+            <a href="@($"/shoppinglists")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ShoppingList? shoppinglist;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        shoppinglist = await context.ShoppingList.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (shoppinglist is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,75 @@
+﻿@page "/slistgroups/delete"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>SListGroup</h2>
+    <hr />
+    @if (slistgroup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ShoppingListId</dt>
+            <dd class="col-sm-10">@slistgroup.ShoppingListId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@slistgroup.UserId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@slistgroup.DateCreated</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@slistgroup.DateUpdated</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@slistgroup.CreatedBy</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@slistgroup.UpdatedBy</dd>
+        </dl>
+        <EditForm method="post" Model="slistgroup" OnValidSubmit="DeleteSListGroup" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(slistgroup is null)">Delete</button> |
+            <a href="/slistgroups">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private SListGroup? slistgroup;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        slistgroup = await context.SListGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (slistgroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteSListGroup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.SListGroup.Remove(slistgroup!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/slistgroups");
+    }
+}

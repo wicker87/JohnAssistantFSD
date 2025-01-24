@@ -1,0 +1,69 @@
+﻿@page "/eventgroups/create"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>EventGroup</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="EventGroup" OnValidSubmit="AddEventGroup" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="eventid" class="form-label">EventId:</label> 
+                <InputNumber id="eventid" @bind-Value="EventGroup.EventId" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.EventId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputText id="userid" @bind-Value="EventGroup.UserId" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="EventGroup.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="EventGroup.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="EventGroup.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="EventGroup.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => EventGroup.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/eventgroups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private EventGroup EventGroup { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEventGroup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.EventGroup.Add(EventGroup);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/eventgroups");
+    }
+}

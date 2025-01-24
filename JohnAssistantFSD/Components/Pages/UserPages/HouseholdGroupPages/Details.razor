@@ -1,0 +1,56 @@
+﻿@page "/householdgroups/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>HouseholdGroup</h2>
+    <hr />
+    @if (householdgroup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">HouseholdId</dt>
+            <dd class="col-sm-10">@householdgroup.HouseholdId</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@householdgroup.UserId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@householdgroup.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@householdgroup.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@householdgroup.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@householdgroup.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/householdgroups/edit?id={householdgroup.Id}")">Edit</a> |
+            <a href="@($"/householdgroups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private HouseholdGroup? householdgroup;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        householdgroup = await context.HouseholdGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (householdgroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

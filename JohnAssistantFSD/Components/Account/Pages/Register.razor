@@ -14,6 +14,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject RoleManager<IdentityRole> RoleManager
 
 <PageTitle>Register</PageTitle>
 
@@ -33,6 +34,18 @@
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.FirstName" class="form-control"
+                autocomplete="firstname" aria-required="true" placeholder="Bill" />
+                <label for="email">First Name</label>
+                <ValidationMessage For="() => Input.FirstName" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.LastName" class="form-control"
+                autocomplete="lastname" aria-required="true" placeholder="Gates" />
+                <label for="email">Last Name</label>
+                <ValidationMessage For="() => Input.LastName" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
                 <label for="password">Password</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
@@ -42,6 +55,9 @@
                 <label for="confirm-password">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
+            <input type="checkbox" id="child" name="child" value="child">
+            <label for="child">I am a child</label>
+            <br>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
@@ -63,6 +79,8 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
+    public bool child=false;
+
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
     public async Task RegisterUser(EditContext editContext)
@@ -72,6 +90,10 @@
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+        user.FirstName = Input.FirstName;
+        user.LastName = Input.LastName;
+
         var result = await UserManager.CreateAsync(user, Input.Password);
 
         if (!result.Succeeded)
@@ -79,7 +101,33 @@
             identityErrors = result.Errors;
             return;
         }
-
+        if(child==false)
+        {
+            if (!await RoleManager.RoleExistsAsync("User"))
+            {
+                await RoleManager.CreateAsync(new IdentityRole("User"));
+            }
+        }
+        else 
+        {
+            if (!await RoleManager.RoleExistsAsync("Child"))
+            {
+                await RoleManager.CreateAsync(new IdentityRole("Child"));
+            }
+        }
+        //add the user to the user role
+        if (child == false)
+        {
+            await UserManager.AddToRoleAsync(user, "User");
+        }
+        else
+        {
+            await UserManager.AddToRoleAsync(user, "Child");
+        }
+        child = false;
+        //add the user id as claim when user registers
+        await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("userId",
+        user.Id));
         Logger.LogInformation("User created a new account with password.");
 
         var userId = await UserManager.GetUserIdAsync(user);
@@ -130,6 +178,14 @@
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
+
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; } = "";
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]

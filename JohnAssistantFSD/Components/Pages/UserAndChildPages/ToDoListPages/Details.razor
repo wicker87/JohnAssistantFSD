@@ -1,0 +1,56 @@
+﻿@page "/todolists/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>ToDoList</h2>
+    <hr />
+    @if (todolist is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Content</dt>
+            <dd class="col-sm-10">@todolist.Content</dd>
+            <dt class="col-sm-2">Completed</dt>
+            <dd class="col-sm-10">@todolist.Completed</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@todolist.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@todolist.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@todolist.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@todolist.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/todolists/edit?id={todolist.Id}")">Edit</a> |
+            <a href="@($"/todolists")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ToDoList? todolist;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        todolist = await context.ToDoList.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (todolist is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

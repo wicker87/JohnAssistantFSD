@@ -1,0 +1,41 @@
+﻿@page "/todolists"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using JohnAssistantFSD.Domain
+@using JohnAssistantFSD.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="todolists/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ToDoList">
+    <PropertyColumn Property="todolist => todolist.Content" />
+    <PropertyColumn Property="todolist => todolist.Completed" />
+    <PropertyColumn Property="todolist => todolist.DateCreated" />
+    <PropertyColumn Property="todolist => todolist.DateUpdated" />
+    <PropertyColumn Property="todolist => todolist.CreatedBy" />
+    <PropertyColumn Property="todolist => todolist.UpdatedBy" />
+
+    <TemplateColumn Context="todolist">
+        <a href="@($"todolists/edit?id={todolist.Id}")">Edit</a> |
+        <a href="@($"todolists/details?id={todolist.Id}")">Details</a> |
+        <a href="@($"todolists/delete?id={todolist.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private JohnAssistantFSDContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

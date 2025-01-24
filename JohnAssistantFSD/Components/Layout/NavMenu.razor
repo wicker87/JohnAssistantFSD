@@ -27,31 +27,30 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div> *@
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Alarm
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Schedule
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> List
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Notes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Reminder
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="User, Child" Context="innercontext">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Events">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Schedule
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="ShoppingList">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Shopping List
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="ToDoList">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> To do List
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="User" Context="innercontext">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Household">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Household
+                </NavLink>
+            </div>
+        </AuthorizeView>
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">

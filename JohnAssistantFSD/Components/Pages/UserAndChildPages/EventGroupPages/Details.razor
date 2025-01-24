@@ -1,0 +1,56 @@
+﻿@page "/eventgroups/details"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>EventGroup</h2>
+    <hr />
+    @if (eventgroup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">EventId</dt>
+            <dd class="col-sm-10">@eventgroup.EventId</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@eventgroup.UserId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@eventgroup.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@eventgroup.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@eventgroup.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@eventgroup.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/eventgroups/edit?id={eventgroup.Id}")">Edit</a> |
+            <a href="@($"/eventgroups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private EventGroup? eventgroup;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        eventgroup = await context.EventGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (eventgroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

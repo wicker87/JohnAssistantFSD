@@ -1,0 +1,79 @@
+﻿@page "/shoppinglists/create"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>ShoppingList</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ShoppingList" OnValidSubmit="AddShoppingList" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content:</label> 
+                <InputText id="content" @bind-Value="ShoppingList.Content" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.Content" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount:</label> 
+                <InputNumber id="amount" @bind-Value="ShoppingList.Amount" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.Amount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cost" class="form-label">Cost:</label> 
+                <InputNumber id="cost" @bind-Value="ShoppingList.Cost" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.Cost" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="bought" class="form-label">Bought:</label> 
+                <InputCheckbox id="bought" @bind-Value="ShoppingList.Bought" class="form-check-input" /> 
+                <ValidationMessage For="() => ShoppingList.Bought" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="ShoppingList.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="ShoppingList.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="ShoppingList.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="ShoppingList.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => ShoppingList.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/shoppinglists">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ShoppingList ShoppingList { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddShoppingList()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ShoppingList.Add(ShoppingList);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/shoppinglists");
+    }
+}

@@ -1,0 +1,69 @@
+﻿@page "/slistgroups/create"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>SListGroup</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="SListGroup" OnValidSubmit="AddSListGroup" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="shoppinglistid" class="form-label">ShoppingListId:</label> 
+                <InputNumber id="shoppinglistid" @bind-Value="SListGroup.ShoppingListId" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.ShoppingListId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputText id="userid" @bind-Value="SListGroup.UserId" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="SListGroup.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="SListGroup.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="SListGroup.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="SListGroup.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => SListGroup.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/slistgroups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private SListGroup SListGroup { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddSListGroup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.SListGroup.Add(SListGroup);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/slistgroups");
+    }
+}

@@ -1,0 +1,96 @@
+﻿@page "/events/create"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "User, Child")]
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Events</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Events" OnValidSubmit="AddEvents" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Events.Name" class="form-control" /> 
+                <ValidationMessage For="() => Events.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Events.Description" class="form-control" /> 
+                <ValidationMessage For="() => Events.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="eventtype" class="form-label">EventType:</label> 
+                <InputText id="eventtype" @bind-Value="Events.EventType" class="form-control" /> 
+                <ValidationMessage For="() => Events.EventType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="additionalnotes" class="form-label">AdditionalNotes:</label> 
+                <InputText id="additionalnotes" @bind-Value="Events.AdditionalNotes" class="form-control" /> 
+                <ValidationMessage For="() => Events.AdditionalNotes" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="startdatetime" class="form-label">StartDateTime:</label> 
+                <InputDate id="startdatetime" @bind-Value="Events.StartDateTime" class="form-control" /> 
+                <ValidationMessage For="() => Events.StartDateTime" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="enddatetime" class="form-label">EndDateTime:</label> 
+                <InputDate id="enddatetime" @bind-Value="Events.EndDateTime" class="form-control" /> 
+                <ValidationMessage For="() => Events.EndDateTime" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label> 
+                <InputText id="location" @bind-Value="Events.Location" class="form-control" /> 
+                <ValidationMessage For="() => Events.Location" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Events.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Events.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Events.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Events.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="Events.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Events.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Events.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Events.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/events">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Events Events { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEvents()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Events.Add(Events);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/events");
+    }
+}

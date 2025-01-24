@@ -1,0 +1,114 @@
+﻿@page "/eventgroups/edit"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>EventGroup</h2>
+<hr />
+@if (EventGroup is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="EventGroup" OnValidSubmit="UpdateEventGroup" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="EventGroup.Id" value="@EventGroup.Id" />
+                <div class="mb-3">
+                    <label for="eventid" class="form-label">EventId:</label>
+                    <InputNumber id="eventid" @bind-Value="EventGroup.EventId" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.EventId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserId:</label>
+                    <InputText id="userid" @bind-Value="EventGroup.UserId" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.UserId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="EventGroup.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="EventGroup.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="EventGroup.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="EventGroup.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/eventgroups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private EventGroup? EventGroup { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        EventGroup ??= await context.EventGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (EventGroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEventGroup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(EventGroup!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EventGroupExists(EventGroup!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/eventgroups");
+    }
+
+    private bool EventGroupExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.EventGroup.Any(e => e.Id == id);
+    }
+}

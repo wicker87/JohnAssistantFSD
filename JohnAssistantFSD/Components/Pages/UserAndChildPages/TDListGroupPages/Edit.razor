@@ -1,0 +1,114 @@
+﻿@page "/tdlistgroups/edit"
+@using Microsoft.EntityFrameworkCore
+@using JohnAssistantFSD.Domain
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>TDListGroup</h2>
+<hr />
+@if (TDListGroup is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="TDListGroup" OnValidSubmit="UpdateTDListGroup" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="TDListGroup.Id" value="@TDListGroup.Id" />
+                <div class="mb-3">
+                    <label for="todolistid" class="form-label">ToDoListId:</label>
+                    <InputNumber id="todolistid" @bind-Value="TDListGroup.ToDoListId" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.ToDoListId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UserId:</label>
+                    <InputText id="userid" @bind-Value="TDListGroup.UserId" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.UserId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="TDListGroup.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="TDListGroup.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="TDListGroup.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="TDListGroup.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => TDListGroup.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/tdlistgroups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private TDListGroup? TDListGroup { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        TDListGroup ??= await context.TDListGroup.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (TDListGroup is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateTDListGroup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(TDListGroup!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TDListGroupExists(TDListGroup!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/tdlistgroups");
+    }
+
+    private bool TDListGroupExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.TDListGroup.Any(e => e.Id == id);
+    }
+}

@@ -1,0 +1,48 @@
+﻿@page "/events"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using JohnAssistantFSD.Domain
+@using JohnAssistantFSD.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
+
+@attribute [Authorize(Roles = "User, Child")]
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="events/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Events">
+    <PropertyColumn Property="events => events.Name" />
+    <PropertyColumn Property="events => events.Description" />
+    <PropertyColumn Property="events => events.EventType" />
+    <PropertyColumn Property="events => events.AdditionalNotes" />
+    <PropertyColumn Property="events => events.StartDateTime" />
+    <PropertyColumn Property="events => events.EndDateTime" />
+    <PropertyColumn Property="events => events.Location" />
+    <PropertyColumn Property="events => events.DateCreated" />
+    <PropertyColumn Property="events => events.DateUpdated" />
+    <PropertyColumn Property="events => events.CreatedBy" />
+    <PropertyColumn Property="events => events.UpdatedBy" />
+
+    <TemplateColumn Context="events">
+        <a href="@($"events/edit?id={events.Id}")">Edit</a> |
+        <a href="@($"events/details?id={events.Id}")">Details</a> |
+        <a href="@($"events/delete?id={events.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private JohnAssistantFSDContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

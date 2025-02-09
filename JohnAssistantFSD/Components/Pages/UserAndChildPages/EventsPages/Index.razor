@@ -5,7 +5,7 @@
 @using JohnAssistantFSD.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
-
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "User, Child")]
 
 <PageTitle>Index</PageTitle>
@@ -14,34 +14,46 @@
 
 <p>
     <a href="events/create">Create New</a>
+    <a href="eventgroups">Included people</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Events">
-    <PropertyColumn Property="events => events.Name" />
+<QuickGrid Class="table" Items="FilteredEvents" Pagination="paginationState">
+    <PropertyColumn Property="events => events.Name" Sortable="true"/>
     <PropertyColumn Property="events => events.Description" />
-    <PropertyColumn Property="events => events.EventType" />
+    <PropertyColumn Property="events => events.EventType" Sortable="true" />
     <PropertyColumn Property="events => events.AdditionalNotes" />
-    <PropertyColumn Property="events => events.StartDateTime" />
-    <PropertyColumn Property="events => events.EndDateTime" />
-    <PropertyColumn Property="events => events.Location" />
-    <PropertyColumn Property="events => events.DateCreated" />
+    <PropertyColumn Property="events => events.StartDateTime" Sortable="true" Format="dd/MM/yyyy"/>
+    <PropertyColumn Property="events => events.EndDateTime" Sortable="true" Format="dd/MM/yyyy" />
+    <PropertyColumn Property="events => events.Location" Sortable="true" />
+    @* <PropertyColumn Property="events => events.DateCreated" />
     <PropertyColumn Property="events => events.DateUpdated" />
     <PropertyColumn Property="events => events.CreatedBy" />
     <PropertyColumn Property="events => events.UpdatedBy" />
-
+ *@
     <TemplateColumn Context="events">
         <a href="@($"events/edit?id={events.Id}")">Edit</a> |
         <a href="@($"events/details?id={events.Id}")">Details</a> |
         <a href="@($"events/delete?id={events.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<EventGroup> EventGroups;
+    private IList<Events> IncludedEvents;
+    private IQueryable<Events> FilteredEvents => context.Events.Where(e => (e.CreatedBy == userId) || (IncludedEvents.Any(ie => e == ie)));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        EventGroups = context.EventGroup.Where(eg => eg.UserId == userId).ToList();
+        IncludedEvents = context.Events.Where(e => EventGroups.Any(eg => e.Id == eg.EventsId)).ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

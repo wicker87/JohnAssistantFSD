@@ -95,9 +95,21 @@ else
 
     [SupplyParameterFromForm]
     private Events? Events { get; set; }
+    private string userId = "System";
+    //Inject the AuthenticationStateProvider to get the user id.
+    @inject AuthenticationStateProvider authenticationStateProvider
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Get the userId claim
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+
         using var context = DbFactory.CreateDbContext();
         Events ??= await context.Events.FirstOrDefaultAsync(m => m.Id == Id);
 
@@ -112,6 +124,9 @@ else
     private async Task UpdateEvents()
     {
         using var context = DbFactory.CreateDbContext();
+        Events.UpdatedBy = userId;
+        //Set the DateUpdated fields to the current date and time.
+        Events.DateUpdated = DateTime.Now;
         context.Attach(Events!).State = EntityState.Modified;
 
         try

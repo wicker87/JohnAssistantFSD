@@ -12,15 +12,16 @@
 
 <p>
     <a href="todolists/create">Create New</a>
+    <a href="tdlistgroups">Included people</a>
 </p>
 
-<QuickGrid Class="table" Items="context.ToDoList">
-    <PropertyColumn Property="todolist => todolist.Content" />
-    <PropertyColumn Property="todolist => todolist.Completed" />
-    <PropertyColumn Property="todolist => todolist.DateCreated" />
+<QuickGrid Class="table" Items="FilteredToDoList" Pagination="paginationState">
+    <PropertyColumn Property="todolist => todolist.Content" Sortable="true" />
+    <PropertyColumn Property="todolist => todolist.Completed" Sortable="true" />
+    @* <PropertyColumn Property="todolist => todolist.DateCreated" />
     <PropertyColumn Property="todolist => todolist.DateUpdated" />
     <PropertyColumn Property="todolist => todolist.CreatedBy" />
-    <PropertyColumn Property="todolist => todolist.UpdatedBy" />
+    <PropertyColumn Property="todolist => todolist.UpdatedBy" /> *@
 
     <TemplateColumn Context="todolist">
         <a href="@($"todolists/edit?id={todolist.Id}")">Edit</a> |
@@ -28,13 +29,24 @@
         <a href="@($"todolists/delete?id={todolist.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<TDListGroup> TDListGroups;
+    private IList<ToDoList> IncludedTDLists;
+    private IQueryable<ToDoList> FilteredToDoList => context.ToDoList.Where(e => e.CreatedBy == userId || IncludedTDLists.Any(eg => eg == e));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        TDListGroups = context.TDListGroup.Where(eg => eg.UserId == userId).ToList();
+        IncludedTDLists = context.ToDoList.Where(e => TDListGroups.Any(eg => e.Id == eg.ToDoListId)).ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

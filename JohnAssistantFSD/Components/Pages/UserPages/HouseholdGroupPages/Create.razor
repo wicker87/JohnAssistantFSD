@@ -3,6 +3,7 @@
 @using JohnAssistantFSD.Domain
 @inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "User, Adminstrator")]
 
 <PageTitle>Create</PageTitle>
 
@@ -17,30 +18,58 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="householdid" class="form-label">HouseholdId:</label> 
-                <InputNumber id="householdid" @bind-Value="HouseholdGroup.HouseholdId" class="form-control" /> 
+                <InputSelect id="householdid" @bind-Value="HouseholdGroup.HouseholdId" class="form-control">
+                    <option value="">-- Select Household --</option>
+                    @if (RelatedHousehold != null)
+                    {
+                        foreach (var household in RelatedHousehold)
+                        {
+                            <option value="@household.Id">@household.Name</option>
+                        }   
+                    }
+                </InputSelect>
+                @* <InputNumber id="householdid" @bind-Value="HouseholdGroup.HouseholdId" class="form-control" />  *@
                 <ValidationMessage For="() => HouseholdGroup.HouseholdId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="userid" class="form-label">UserId:</label> 
-                <InputText id="userid" @bind-Value="HouseholdGroup.UserId" class="form-control" /> 
+               @* <InputText id="userid" @bind-Value="HouseholdGroup.UserId" class="form-control" /> *@
+                <InputSelect id="userid" @bind-Value="HouseholdGroup.UserId" class="form-control">
+                    <option value="">-- Select User --</option>
+                    @if (Users != null)
+                    {
+                        foreach (var user in Users)
+                        {
+                             @* if(user.IdentityRole.IsInRole("Child, Administrator"))
+                            {
+
+                            }
+                            else
+                            {
+                                <option value="@user.Id">@user.FirstName @user.LastName</option>
+                            }  *@
+                            <option value="@user.Id">@user.FirstName @user.LastName</option>
+                        }
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => HouseholdGroup.UserId" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="datecreated" class="form-label">DateCreated:</label> 
                 <InputDate id="datecreated" @bind-Value="HouseholdGroup.DateCreated" class="form-control" /> 
                 <ValidationMessage For="() => HouseholdGroup.DateCreated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="dateupdated" class="form-label">DateUpdated:</label> 
                 <InputDate id="dateupdated" @bind-Value="HouseholdGroup.DateUpdated" class="form-control" /> 
                 <ValidationMessage For="() => HouseholdGroup.DateUpdated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="createdby" class="form-label">CreatedBy:</label> 
                 <InputText id="createdby" @bind-Value="HouseholdGroup.CreatedBy" class="form-control" /> 
                 <ValidationMessage For="() => HouseholdGroup.CreatedBy" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="updatedby" class="form-label">UpdatedBy:</label> 
                 <InputText id="updatedby" @bind-Value="HouseholdGroup.UpdatedBy" class="form-control" /> 
                 <ValidationMessage For="() => HouseholdGroup.UpdatedBy" class="text-danger" /> 
@@ -57,11 +86,41 @@
 @code {
     [SupplyParameterFromForm]
     private HouseholdGroup HouseholdGroup { get; set; } = new();
+    private JohnAssistantFSDContext context = default!;
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<HouseholdGroup> HouseholdGroups;
+    private IList<Household> RelatedHousehold;
+    // private IQueryable<HouseholdGroup> HouseholdGroups => context.HouseholdGroup.Where(e=>e.UserId==userId);
+    // private IQueryable<Household> RelatedHousehold => context.Household.Where((h => h.CreatedBy == userId)||(h=>HouseholdGroups.Any(hg=>hg.HouseholdId==h.Id));
+    private IList<JohnAssistantFSDUser> Users;
+    protected override async void OnInitialized()
+    {
 
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+
+        context = DbFactory.CreateDbContext();
+        Users = context.Users.ToList();
+        HouseholdGroups = context.HouseholdGroup.Where(e => e.UserId == userId).ToList();
+        RelatedHousehold = context.Household.Where(h => h.CreatedBy == userId || HouseholdGroups.Any(hg=>hg.HouseholdId==h.Id)).ToList();
+        Users = context.Users.ToList();
+    }
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddHouseholdGroup()
     {
         using var context = DbFactory.CreateDbContext();
+        HouseholdGroup.CreatedBy = userId;
+        HouseholdGroup.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        HouseholdGroup.DateCreated = DateTime.Now;
+        HouseholdGroup.DateUpdated = DateTime.Now;
         context.HouseholdGroup.Add(HouseholdGroup);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/householdgroups");

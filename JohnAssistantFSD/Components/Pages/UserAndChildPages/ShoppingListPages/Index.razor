@@ -12,17 +12,18 @@
 
 <p>
     <a href="shoppinglists/create">Create New</a>
+    <a href="slistgroups">Included people</a>
 </p>
 
-<QuickGrid Class="table" Items="context.ShoppingList">
-    <PropertyColumn Property="shoppinglist => shoppinglist.Content" />
-    <PropertyColumn Property="shoppinglist => shoppinglist.Amount" />
-    <PropertyColumn Property="shoppinglist => shoppinglist.Cost" />
-    <PropertyColumn Property="shoppinglist => shoppinglist.Bought" />
-    <PropertyColumn Property="shoppinglist => shoppinglist.DateCreated" />
+<QuickGrid Class="table" Items="FilteredShoppingList" Pagination="paginationState">
+    <PropertyColumn Property="shoppinglist => shoppinglist.Content" Sortable="true" />
+    <PropertyColumn Property="shoppinglist => shoppinglist.Amount" Sortable="true" />
+    <PropertyColumn Property="shoppinglist => shoppinglist.Cost" Sortable="true" />
+    <PropertyColumn Property="shoppinglist => shoppinglist.Bought" Sortable="true" />
+    @* <PropertyColumn Property="shoppinglist => shoppinglist.DateCreated" />
     <PropertyColumn Property="shoppinglist => shoppinglist.DateUpdated" />
     <PropertyColumn Property="shoppinglist => shoppinglist.CreatedBy" />
-    <PropertyColumn Property="shoppinglist => shoppinglist.UpdatedBy" />
+    <PropertyColumn Property="shoppinglist => shoppinglist.UpdatedBy" /> *@
 
     <TemplateColumn Context="shoppinglist">
         <a href="@($"shoppinglists/edit?id={shoppinglist.Id}")">Edit</a> |
@@ -30,13 +31,24 @@
         <a href="@($"shoppinglists/delete?id={shoppinglist.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<SListGroup> SListGroups;
+    private IList<ShoppingList> IncludedSLists;
+    private IQueryable<ShoppingList> FilteredShoppingList => context.ShoppingList.Where(e => e.CreatedBy == userId || IncludedSLists.Any(eg => eg == e));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        SListGroups = context.SListGroup.Where(eg => eg.UserId == userId).ToList();
+        IncludedSLists = context.ShoppingList.Where(e => SListGroups.Any(eg => e.Id == eg.ShoppingListId)).ToList();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

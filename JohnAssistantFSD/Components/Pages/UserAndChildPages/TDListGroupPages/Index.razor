@@ -12,15 +12,22 @@
 
 <p>
     <a href="tdlistgroups/create">Create New</a>
+    <a href="todolists">back to To do list</a>
 </p>
 
-<QuickGrid Class="table" Items="context.TDListGroup">
-    <PropertyColumn Property="tdlistgroup => tdlistgroup.ToDoListId" />
-    <PropertyColumn Property="tdlistgroup => tdlistgroup.UserId" />
-    <PropertyColumn Property="tdlistgroup => tdlistgroup.DateCreated" />
+<QuickGrid Class="table" Items="FilteredTDListGroups" Pagination="paginationState">
+    <TemplateColumn Context="tdlistgroup" Title="ToDoList">
+        @GetTDListString(tdlistgroup.ToDoListId)
+    </TemplateColumn>
+    <TemplateColumn Context="tdlistgroup" Title="User">
+        @GetUserString(tdlistgroup.UserId)
+    </TemplateColumn>
+    @* <PropertyColumn Property="tdlistgroup => tdlistgroup.ToDoListId" />
+    <PropertyColumn Property="tdlistgroup => tdlistgroup.UserId" /> *@
+    @* <PropertyColumn Property="tdlistgroup => tdlistgroup.DateCreated" />
     <PropertyColumn Property="tdlistgroup => tdlistgroup.DateUpdated" />
     <PropertyColumn Property="tdlistgroup => tdlistgroup.CreatedBy" />
-    <PropertyColumn Property="tdlistgroup => tdlistgroup.UpdatedBy" />
+    <PropertyColumn Property="tdlistgroup => tdlistgroup.UpdatedBy" /> *@
 
     <TemplateColumn Context="tdlistgroup">
         <a href="@($"tdlistgroups/edit?id={tdlistgroup.Id}")">Edit</a> |
@@ -28,14 +35,40 @@
         <a href="@($"tdlistgroups/delete?id={tdlistgroup.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<TDListGroup> PersonalTDLists;
+    private IList<TDListGroup> IncludedPeople;
+    private IList<ToDoList> TDLists;
+    private IList<JohnAssistantFSDUser> Users;
+    private IQueryable<TDListGroup> FilteredTDListGroups => context.TDListGroup.Where(eg => IncludedPeople.Any(ip => ip == eg));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        PersonalTDLists = context.TDListGroup.Where(eg => eg.UserId == userId || eg.CreatedBy == userId).ToList();
+        IncludedPeople = context.TDListGroup.Where(eg => PersonalTDLists.Any(pe => pe.ToDoListId == eg.ToDoListId)).ToList();
+        TDLists = context.ToDoList.ToList();
+        Users = context.Users.ToList();
     }
-
+    private string GetTDListString(int? tdListId)
+    {
+        var tdlist = TDLists.FirstOrDefault(c => c.Id == tdListId);
+        return tdlist == null ?
+        string.Empty : $"{tdlist.Content}";
+    }
+    private string GetUserString(string UserId)
+    {
+        var user = Users.FirstOrDefault(c => c.Id == UserId);
+        return user == null ?
+        string.Empty : $"{user.FirstName} {user.LastName}";
+    }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

@@ -25,22 +25,22 @@
                 <InputCheckbox id="completed" @bind-Value="ToDoList.Completed" class="form-check-input" /> 
                 <ValidationMessage For="() => ToDoList.Completed" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="datecreated" class="form-label">DateCreated:</label> 
                 <InputDate id="datecreated" @bind-Value="ToDoList.DateCreated" class="form-control" /> 
                 <ValidationMessage For="() => ToDoList.DateCreated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="dateupdated" class="form-label">DateUpdated:</label> 
                 <InputDate id="dateupdated" @bind-Value="ToDoList.DateUpdated" class="form-control" /> 
                 <ValidationMessage For="() => ToDoList.DateUpdated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="createdby" class="form-label">CreatedBy:</label> 
                 <InputText id="createdby" @bind-Value="ToDoList.CreatedBy" class="form-control" /> 
                 <ValidationMessage For="() => ToDoList.CreatedBy" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="updatedby" class="form-label">UpdatedBy:</label> 
                 <InputText id="updatedby" @bind-Value="ToDoList.UpdatedBy" class="form-control" /> 
                 <ValidationMessage For="() => ToDoList.UpdatedBy" class="text-danger" /> 
@@ -57,12 +57,41 @@
 @code {
     [SupplyParameterFromForm]
     private ToDoList ToDoList { get; set; } = new();
+    private TDListGroup TDListGroup { get; set; } = new();
+    private string userId = "System";
+    //Inject the AuthenticationStateProvider to get the user id.
+    @inject AuthenticationStateProvider authenticationStateProvider
+    //Override the OnInitialized method to get the user id.
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Get the userId claim
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+    }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddToDoList()
     {
         using var context = DbFactory.CreateDbContext();
+        ToDoList.CreatedBy = userId;
+        ToDoList.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        ToDoList.DateCreated = DateTime.Now;
+        ToDoList.DateUpdated = DateTime.Now;
+        TDListGroup.UserId = userId;
+        TDListGroup.ToDoListId = ToDoList.Id;
+        TDListGroup.CreatedBy = userId;
+        TDListGroup.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        TDListGroup.DateCreated = DateTime.Now;
+        TDListGroup.DateUpdated = DateTime.Now;
         context.ToDoList.Add(ToDoList);
+        context.TDListGroup.Add(TDListGroup);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/todolists");
     }

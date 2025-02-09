@@ -60,7 +60,7 @@ namespace JohnAssistantFSD.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EventId = table.Column<int>(type: "int", nullable: true),
+                    EventsId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -323,12 +323,51 @@ namespace JohnAssistantFSD.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "3781efa7-66dc-47f0-860f-e506d04102e4", 0, "9e943990-4622-4667-9fdd-d2653f3c1550", "admin@localhost.com", true, "Admin", "User", false, null, "ADMIN@LOCALHOST.COM", "ADMIN@LOCALHOST.COM", "AQAAAAIAAYagAAAAEN4quI5mtUV+uEEmBFS8GZz62Y+LMDCDwTtKABIEbDF5+0AtHNBIO3G5DCT8m/Cr2g==", null, false, "0671cd38-74ab-415c-8ae8-055d59f802a6", false, "admin@localhost.com" });
+                values: new object[,]
+                {
+                    { "3781efa7-66dc-47f0-860f-e506d04102e4", 0, "2966ce05-e18e-4e57-90bb-0c5c2f950052", "admin@localhost.com", true, "Admin", "User", false, null, "ADMIN@LOCALHOST.COM", "ADMIN@LOCALHOST.COM", "AQAAAAIAAYagAAAAEHiLeI25RUg8CAiKFIcKqwHs0Srq9VRtiURjF0VBhLYFt+jb0d0mf8dy9B8Wh0R14w==", null, false, "4ba8fed5-8075-4585-93d2-d5f4f4ab856e", false, "admin@localhost.com" },
+                    { "44dc068a-13ca-4b8e-b776-72e2bcd06509", 0, "79f0cbc0-816c-4285-82e4-1bbae1a8ec95", "johntan@localhost.com", true, "John", "Tan", false, null, "JOHN@LOCALHOST.COM", "JOHN@LOCALHOST.COM", "AQAAAAIAAYagAAAAEFjrVV1cmZpaKBG6DO6ABCytzuclsu856N7QISbEfg9++vBRarXMNJ1OTvUrNdHfWw==", null, false, "98835c72-bb52-44f5-b205-825488a4f1ee", false, "johntan@localhost.com" },
+                    { "66211897-8c20-473c-98cc-1172351a5176", 0, "57e6b744-b310-4061-95cc-b00f7f20c91a", "aj@localhost.com", true, "A", "J", false, null, "AJ@LOCALHOST.COM", "AJ@LOCALHOST.COM", "AQAAAAIAAYagAAAAEJJRrMzcMCU84sfqnqQUSzSvzycOC4v89Vmln3ssMYA5QNVgZmFGqfCRpTFnisQ8TA==", null, false, "1732203a-19e3-409f-b097-c3308f971d63", false, "aj@localhost.com" },
+                    { "9ebd2118-39da-4440-a42e-0b574bf2da25", 0, "bced8bbd-e2e9-49b9-81cb-f5f396354785", "adamtan@localhost.com", true, "Adam", "Tan", false, null, "ADAMTAN@LOCALHOST.COM", "ADAMTAN@LOCALHOST.COM", "AQAAAAIAAYagAAAAELHd6bU45z1B3RabJrV1W+vdKoNZulkWKexnkFobz1oON5S4eqcvEFfMn/DrGKCBUw==", null, false, "0ebc8991-b2dc-40f9-a023-1de8b0ec7bec", false, "adamtan@localhost.com" },
+                    { "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6", 0, "113d3d42-b2a5-4bef-b261-77a230b23d87", "pl@localhost.com", true, "p", "l", false, null, "PL@LOCALHOST.COM", "PL@LOCALHOST.COM", "AQAAAAIAAYagAAAAEEyPqaNjdqOGWJNXJJzh4eQJsdL6UrCXCuiPrNppmYQlGy+INnPEXDOvsYqCWfmzfQ==", null, false, "f78cbd8c-91a9-421f-8a1e-c3a02c6e3c3b", false, "adamtan@localhost.com" },
+                    { "fb318f66-6952-43f0-be25-d7b8fbf1e42f", 0, "6a87761d-b88e-4a64-9e25-05273954d12b", "pt@localhost.com", true, "P", "T", false, null, "PT@LOCALHOST.COM", "PT@LOCALHOST.COM", "AQAAAAIAAYagAAAAEDlSmZbWuRNRSzjtVhYqCuWNDGjDVybzI5T9owkYtRn4ri/Zm+su9/LK73yyrI3V0A==", null, false, "738f23af-e087-4f67-b07d-ae81f9fa942f", false, "pt@localhost.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Household",
+                columns: new[] { "Id", "CreatedBy", "DateCreated", "DateUpdated", "Name", "UpdatedBy" },
+                values: new object[,]
+                {
+                    { 1, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3041), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3255), "Wombat", "System" },
+                    { 2, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3261), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3261), "Kang", "System" },
+                    { 3, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3263), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3264), "bat", "System" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "HouseholdGroup",
+                columns: new[] { "Id", "CreatedBy", "DateCreated", "DateUpdated", "HouseholdId", "UpdatedBy", "UserId" },
+                values: new object[,]
+                {
+                    { 1, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3530), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3531), 1, "System", "44dc068a-13ca-4b8e-b776-72e2bcd06509" },
+                    { 2, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3546), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3547), 1, "System", "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6" },
+                    { 3, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3549), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3549), 2, "System", "9ebd2118-39da-4440-a42e-0b574bf2da25" },
+                    { 4, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3551), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3551), 2, "System", "fb318f66-6952-43f0-be25-d7b8fbf1e42f" },
+                    { 5, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3553), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3553), 3, "System", "44dc068a-13ca-4b8e-b776-72e2bcd06509" },
+                    { 6, "System", new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3555), new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3556), 3, "System", "66211897-8c20-473c-98cc-1172351a5176" }
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "ad2bcf0c-20db-474f-8407-5a6b159518ba", "3781efa7-66dc-47f0-860f-e506d04102e4" });
+                values: new object[,]
+                {
+                    { "ad2bcf0c-20db-474f-8407-5a6b159518ba", "3781efa7-66dc-47f0-860f-e506d04102e4" },
+                    { "dc46b121-84af-43a2-ab9b-b4387466ff60", "44dc068a-13ca-4b8e-b776-72e2bcd06509" },
+                    { "43688613-3972-4b3c-a932-d528efe25e08", "66211897-8c20-473c-98cc-1172351a5176" },
+                    { "dc46b121-84af-43a2-ab9b-b4387466ff60", "9ebd2118-39da-4440-a42e-0b574bf2da25" },
+                    { "43688613-3972-4b3c-a932-d528efe25e08", "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6" },
+                    { "43688613-3972-4b3c-a932-d528efe25e08", "fb318f66-6952-43f0-be25-d7b8fbf1e42f" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

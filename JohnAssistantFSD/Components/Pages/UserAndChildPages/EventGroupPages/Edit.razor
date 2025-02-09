@@ -21,11 +21,11 @@ else
             <EditForm method="post" Model="EventGroup" OnValidSubmit="UpdateEventGroup" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert"/>
-                <input type="hidden" name="EventGroup.Id" value="@EventGroup.Id" />
+                <input type="hidden" name="EventGroup.Id" value="@EventGroup.Id" /> 
                 <div class="mb-3">
                     <label for="eventid" class="form-label">EventId:</label>
-                    <InputNumber id="eventid" @bind-Value="EventGroup.EventId" class="form-control" />
-                    <ValidationMessage For="() => EventGroup.EventId" class="text-danger" />
+                    <InputNumber id="eventid" @bind-Value="EventGroup.EventsId" class="form-control" />
+                    <ValidationMessage For="() => EventGroup.EventsId" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="userid" class="form-label">UserId:</label>
@@ -60,7 +60,7 @@ else
 
 <div>
     <a href="/eventgroups">Back to List</a>
-</div>
+</div> 
 
 @code {
     [SupplyParameterFromQuery]

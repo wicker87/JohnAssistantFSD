@@ -55,7 +55,7 @@
                 <label for="confirm-password">Confirm Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
-            <input type="checkbox" id="child" name="child" value="child">
+            <InputCheckbox id="child" name="child" @bind-Value="child"/>
             <label for="child">I am a child</label>
             <br>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>

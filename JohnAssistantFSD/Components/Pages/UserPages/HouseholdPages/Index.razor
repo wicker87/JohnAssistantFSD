@@ -11,30 +11,46 @@
 <h1>Index</h1>
 
 <p>
-    <a href="households/create">Create New</a>
+    <AuthorizeView roles="User">
+        <a href="households/create">Create New</a>
+        <a href="householdgroups">Included people</a>
+    </AuthorizeView>
 </p>
 
-<QuickGrid Class="table" Items="context.Household">
-    <PropertyColumn Property="household => household.Name" />
-    <PropertyColumn Property="household => household.DateCreated" />
+<QuickGrid Class="table" Items="RelatedHousehold" Pagination="paginationState">
+    <PropertyColumn Property="household => household.Name" Sortable="true" />
+    @* <PropertyColumn Property="household => household.DateCreated" />
     <PropertyColumn Property="household => household.DateUpdated" />
     <PropertyColumn Property="household => household.CreatedBy" />
-    <PropertyColumn Property="household => household.UpdatedBy" />
+    <PropertyColumn Property="household => household.UpdatedBy" /> *@
 
     <TemplateColumn Context="household">
-        <a href="@($"households/edit?id={household.Id}")">Edit</a> |
-        <a href="@($"households/details?id={household.Id}")">Details</a> |
-        <a href="@($"households/delete?id={household.Id}")">Delete</a>
+        <AuthorizeView roles="User">
+            <a href="@($"households/edit?id={household.Id}")">Edit</a> |
+            <a href="@($"households/details?id={household.Id}")">Details</a> |
+            <a href="@($"households/delete?id={household.Id}")">Delete</a>
+        </AuthorizeView>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<HouseholdGroup> HouseholdGroups;
+    private IList<Household> IncludedHouseholds;
+    private IQueryable<Household> RelatedHousehold => context.Household.Where(h => h.CreatedBy == userId || IncludedHouseholds.Any(hg => hg == h));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        HouseholdGroups = context.HouseholdGroup.Where(e => e.UserId == userId).ToList();
+        IncludedHouseholds=context.Household.Where(e => HouseholdGroups.Any(eg => e.Id == eg.HouseholdId)).ToList();
     }
-
+    
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

@@ -12,15 +12,22 @@
 
 <p>
     <a href="eventgroups/create">Create New</a>
+    <a href="events">back to events</a>
 </p>
 
-<QuickGrid Class="table" Items="context.EventGroup">
-    <PropertyColumn Property="eventgroup => eventgroup.EventId" />
-    <PropertyColumn Property="eventgroup => eventgroup.UserId" />
-    <PropertyColumn Property="eventgroup => eventgroup.DateCreated" />
+<QuickGrid Class="table" Items="FilteredEventGroups" Pagination="paginationState">
+    <TemplateColumn Context="eventgroup" Title="Event">
+        @GetEventString(eventgroup.EventsId)
+    </TemplateColumn>
+    <TemplateColumn Context="eventgroup" Title="User">
+        @GetUserString(eventgroup.UserId)
+    </TemplateColumn>
+    @* <PropertyColumn Property="eventgroup => eventgroup.EventsId" Sortable="true"/>
+    <PropertyColumn Property="eventgroup => eventgroup.UserId" Sortable="true" /> *@
+    @* <PropertyColumn Property="eventgroup => eventgroup.DateCreated" />
     <PropertyColumn Property="eventgroup => eventgroup.DateUpdated" />
     <PropertyColumn Property="eventgroup => eventgroup.CreatedBy" />
-    <PropertyColumn Property="eventgroup => eventgroup.UpdatedBy" />
+    <PropertyColumn Property="eventgroup => eventgroup.UpdatedBy" /> *@
 
     <TemplateColumn Context="eventgroup">
         <a href="@($"eventgroups/edit?id={eventgroup.Id}")">Edit</a> |
@@ -28,14 +35,40 @@
         <a href="@($"eventgroups/delete?id={eventgroup.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<EventGroup> PersonalEvents;
+    private IList<EventGroup> IncludedPeople;
+    private IList<Events> Events;
+    private IList<JohnAssistantFSDUser> Users;
+    private IQueryable<EventGroup> FilteredEventGroups => context.EventGroup.Where(eg=>IncludedPeople.Any(ip=>ip==eg));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        PersonalEvents = context.EventGroup.Where(eg => eg.UserId == userId||eg.CreatedBy==userId).ToList();
+        IncludedPeople = context.EventGroup.Where(eg => PersonalEvents.Any(pe => pe.EventsId == eg.EventsId)).ToList();
+        Events = context.Events.ToList();
+        Users=context.Users.ToList();
     }
-
+    private string GetEventString(int? EventsId)
+    {
+        var events = Events.FirstOrDefault(c => c.Id == EventsId);
+        return events == null ?
+        string.Empty : $"{events.Name}";
+    }
+    private string GetUserString(string UserId)
+    {
+        var user = Users.FirstOrDefault(c => c.Id == UserId);
+        return user == null ?
+        string.Empty : $"{user.FirstName} {user.LastName}";
+    }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

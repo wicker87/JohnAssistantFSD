@@ -35,22 +35,22 @@
                 <InputCheckbox id="bought" @bind-Value="ShoppingList.Bought" class="form-check-input" /> 
                 <ValidationMessage For="() => ShoppingList.Bought" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="datecreated" class="form-label">DateCreated:</label> 
                 <InputDate id="datecreated" @bind-Value="ShoppingList.DateCreated" class="form-control" /> 
                 <ValidationMessage For="() => ShoppingList.DateCreated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="dateupdated" class="form-label">DateUpdated:</label> 
                 <InputDate id="dateupdated" @bind-Value="ShoppingList.DateUpdated" class="form-control" /> 
                 <ValidationMessage For="() => ShoppingList.DateUpdated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="createdby" class="form-label">CreatedBy:</label> 
                 <InputText id="createdby" @bind-Value="ShoppingList.CreatedBy" class="form-control" /> 
                 <ValidationMessage For="() => ShoppingList.CreatedBy" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="updatedby" class="form-label">UpdatedBy:</label> 
                 <InputText id="updatedby" @bind-Value="ShoppingList.UpdatedBy" class="form-control" /> 
                 <ValidationMessage For="() => ShoppingList.UpdatedBy" class="text-danger" /> 
@@ -67,12 +67,41 @@
 @code {
     [SupplyParameterFromForm]
     private ShoppingList ShoppingList { get; set; } = new();
+    private SListGroup SListGroup { get; set; } = new();
+    private string userId = "System";
+    //Inject the AuthenticationStateProvider to get the user id.
+    @inject AuthenticationStateProvider authenticationStateProvider
+    //Override the OnInitialized method to get the user id.
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Get the userId claim
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+    }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddShoppingList()
     {
         using var context = DbFactory.CreateDbContext();
+        ShoppingList.CreatedBy = userId;
+        ShoppingList.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        ShoppingList.DateCreated = DateTime.Now;
+        ShoppingList.DateUpdated = DateTime.Now;
+        SListGroup.UserId = userId;
+        SListGroup.ShoppingListId = ShoppingList.Id;
+        SListGroup.CreatedBy = userId;
+        SListGroup.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        SListGroup.DateCreated = DateTime.Now;
+        SListGroup.DateUpdated = DateTime.Now;
         context.ShoppingList.Add(ShoppingList);
+        context.SListGroup.Add(SListGroup);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/shoppinglists");
     }

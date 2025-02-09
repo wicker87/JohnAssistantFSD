@@ -12,15 +12,22 @@
 
 <p>
     <a href="slistgroups/create">Create New</a>
+    <a href="shoppinglists">back to shopping lists</a>
 </p>
 
-<QuickGrid Class="table" Items="context.SListGroup">
-    <PropertyColumn Property="slistgroup => slistgroup.ShoppingListId" />
-    <PropertyColumn Property="slistgroup => slistgroup.UserId" />
-    <PropertyColumn Property="slistgroup => slistgroup.DateCreated" />
+<QuickGrid Class="table" Items="FilteredSListGroups" Pagination="paginationState">
+    <TemplateColumn Context="slistgroup" Title="ShoppingList">
+        @GetSListString(slistgroup.ShoppingListId)
+    </TemplateColumn>
+    <TemplateColumn Context="eventgroup" Title="User">
+        @GetUserString(eventgroup.UserId)
+    </TemplateColumn>
+    @* <PropertyColumn Property="slistgroup => slistgroup.ShoppingListId" />
+    <PropertyColumn Property="slistgroup => slistgroup.UserId" /> *@
+    @* <PropertyColumn Property="slistgroup => slistgroup.DateCreated" />
     <PropertyColumn Property="slistgroup => slistgroup.DateUpdated" />
     <PropertyColumn Property="slistgroup => slistgroup.CreatedBy" />
-    <PropertyColumn Property="slistgroup => slistgroup.UpdatedBy" />
+    <PropertyColumn Property="slistgroup => slistgroup.UpdatedBy" /> *@
 
     <TemplateColumn Context="slistgroup">
         <a href="@($"slistgroups/edit?id={slistgroup.Id}")">Edit</a> |
@@ -28,14 +35,40 @@
         <a href="@($"slistgroups/delete?id={slistgroup.Id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
-
+<Paginator State="paginationState" />
 @code {
     private JohnAssistantFSDContext context = default!;
-
-    protected override void OnInitialized()
+    private string userId = string.Empty;
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<SListGroup> PersonalSLists;
+    private IList<SListGroup> IncludedPeople;
+    private IList<ShoppingList> ShoppingLists;
+    private IList<JohnAssistantFSDUser> Users;
+    private IQueryable<SListGroup> FilteredSListGroups => context.SListGroup.Where(eg => IncludedPeople.Any(ip => ip == eg));
+    PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
+    protected override async void OnInitialized()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Extract user information
+        userId = user.FindFirst("userId")?.Value ?? string.Empty;
         context = DbFactory.CreateDbContext();
+        PersonalSLists = context.SListGroup.Where(eg => eg.UserId == userId || eg.CreatedBy == userId).ToList();
+        IncludedPeople = context.SListGroup.Where(eg => PersonalSLists.Any(pe => pe.ShoppingListId == eg.ShoppingListId)).ToList();
+        ShoppingLists = context.ShoppingList.ToList();
+        Users = context.Users.ToList();
     }
-
+    private string GetSListString(int? ShoppingListId)
+    {
+        var shoppinglist= ShoppingLists.FirstOrDefault(c => c.Id == ShoppingListId);
+        return shoppinglist == null ?
+        string.Empty : $"{shoppinglist.Content}";
+    }
+    private string GetUserString(string UserId)
+    {
+        var user = Users.FirstOrDefault(c => c.Id == UserId);
+        return user == null ?
+        string.Empty : $"{user.FirstName} {user.LastName}";
+    }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

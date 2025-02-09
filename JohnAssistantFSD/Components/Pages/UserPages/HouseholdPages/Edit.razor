@@ -3,7 +3,7 @@
 @using JohnAssistantFSD.Domain
 @inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
 @inject NavigationManager NavigationManager
-
+@attribute [Authorize(Roles = "User")]
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>

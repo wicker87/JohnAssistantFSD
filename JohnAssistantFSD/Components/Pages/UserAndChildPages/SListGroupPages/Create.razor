@@ -17,30 +17,50 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="shoppinglistid" class="form-label">ShoppingListId:</label> 
-                <InputNumber id="shoppinglistid" @bind-Value="SListGroup.ShoppingListId" class="form-control" /> 
+                <InputSelect id="shoppinglistid" @bind-Value="SListGroup.ShoppingListId" class="form-control">
+                    <option value="">-- Select list item --</option>
+                    @if (ShoppingLists != null)
+                    {
+                        foreach (var shoppinglist in ShoppingLists)
+                        {
+                            <option value="@shoppinglist.Id">@shoppinglist.Content</option>
+                        }
+                    }
+                </InputSelect>
+                @* <InputNumber id="shoppinglistid" @bind-Value="SListGroup.ShoppingListId" class="form-control" />  *@
                 <ValidationMessage For="() => SListGroup.ShoppingListId" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="userid" class="form-label">UserId:</label> 
-                <InputText id="userid" @bind-Value="SListGroup.UserId" class="form-control" /> 
+                <InputSelect id="userid" @bind-Value="SListGroup.UserId" class="form-control">
+                    <option value="">-- Select User --</option>
+                    @if (UserList != null)
+                    {
+                        foreach (var user in UserList)
+                        {
+                            <option value="@user.Id">@user.FirstName @user.LastName</option>
+                        }
+                    }
+                </InputSelect>
+                @* <InputText id="userid" @bind-Value="SListGroup.UserId" class="form-control" />  *@
                 <ValidationMessage For="() => SListGroup.UserId" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="datecreated" class="form-label">DateCreated:</label> 
                 <InputDate id="datecreated" @bind-Value="SListGroup.DateCreated" class="form-control" /> 
                 <ValidationMessage For="() => SListGroup.DateCreated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="dateupdated" class="form-label">DateUpdated:</label> 
                 <InputDate id="dateupdated" @bind-Value="SListGroup.DateUpdated" class="form-control" /> 
                 <ValidationMessage For="() => SListGroup.DateUpdated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="createdby" class="form-label">CreatedBy:</label> 
                 <InputText id="createdby" @bind-Value="SListGroup.CreatedBy" class="form-control" /> 
                 <ValidationMessage For="() => SListGroup.CreatedBy" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" hidden>
                 <label for="updatedby" class="form-label">UpdatedBy:</label> 
                 <InputText id="updatedby" @bind-Value="SListGroup.UpdatedBy" class="form-control" /> 
                 <ValidationMessage For="() => SListGroup.UpdatedBy" class="text-danger" /> 
@@ -57,11 +77,41 @@
 @code {
     [SupplyParameterFromForm]
     private SListGroup SListGroup { get; set; } = new();
-
+    private JohnAssistantFSDContext context = default!;
+    private string userId = "System";
+    //Inject the AuthenticationStateProvider to get the user id.
+    @inject AuthenticationStateProvider authenticationStateProvider
+    private IList<ShoppingList> ShoppingLists;
+    private IList<HouseholdGroup> UserHousehold;
+    private IList<HouseholdGroup> UserEntireHousehold;
+    private IList<JohnAssistantFSDUser> UserList;
+   
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Get the userId claim
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+        context = DbFactory.CreateDbContext();
+        ShoppingLists= context.ShoppingList.ToList();
+        UserHousehold = context.HouseholdGroup.Where(hg => hg.UserId == userId).ToList();
+        UserEntireHousehold = context.HouseholdGroup.Where(ueh => UserHousehold.Any(uh => uh.HouseholdId == ueh.HouseholdId)).ToList();
+        UserList = context.Users.Where(u => UserEntireHousehold.Any(ueh => ueh.UserId == u.Id)).ToList();
+    }
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddSListGroup()
     {
         using var context = DbFactory.CreateDbContext();
+        SListGroup.CreatedBy = userId;
+        SListGroup.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        SListGroup.DateCreated = DateTime.Now;
+        SListGroup.DateUpdated = DateTime.Now;
         context.SListGroup.Add(SListGroup);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/slistgroups");

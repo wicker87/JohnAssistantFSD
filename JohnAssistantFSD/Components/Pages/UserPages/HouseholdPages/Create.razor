@@ -3,7 +3,7 @@
 @using JohnAssistantFSD.Domain
 @inject IDbContextFactory<JohnAssistantFSD.Data.JohnAssistantFSDContext> DbFactory
 @inject NavigationManager NavigationManager
-
+@attribute [Authorize(Roles = "User")]
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
@@ -20,22 +20,22 @@
                 <InputText id="name" @bind-Value="Household.Name" class="form-control" /> 
                 <ValidationMessage For="() => Household.Name" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="datecreated" class="form-label">DateCreated:</label> 
                 <InputDate id="datecreated" @bind-Value="Household.DateCreated" class="form-control" /> 
                 <ValidationMessage For="() => Household.DateCreated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="dateupdated" class="form-label">DateUpdated:</label> 
                 <InputDate id="dateupdated" @bind-Value="Household.DateUpdated" class="form-control" /> 
                 <ValidationMessage For="() => Household.DateUpdated" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="createdby" class="form-label">CreatedBy:</label> 
                 <InputText id="createdby" @bind-Value="Household.CreatedBy" class="form-control" /> 
                 <ValidationMessage For="() => Household.CreatedBy" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
+            <div class="mb-3" Hidden>
                 <label for="updatedby" class="form-label">UpdatedBy:</label> 
                 <InputText id="updatedby" @bind-Value="Household.UpdatedBy" class="form-control" /> 
                 <ValidationMessage For="() => Household.UpdatedBy" class="text-danger" /> 
@@ -52,12 +52,40 @@
 @code {
     [SupplyParameterFromForm]
     private Household Household { get; set; } = new();
-
+    private HouseholdGroup HouseholdGroup { get; set; } = new();
+    private string userId = "System";
+    //Inject the AuthenticationStateProvider to get the user id.
+    @inject AuthenticationStateProvider authenticationStateProvider
+    //Override the OnInitialized method to get the user id.
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        // Get the userId claim
+        var userIdClaim = user.FindFirst("userId");
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+        }
+    }
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddHousehold()
     {
         using var context = DbFactory.CreateDbContext();
+        Household.CreatedBy = userId;
+        Household.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        Household.DateCreated = DateTime.Now;
+        Household.DateUpdated = DateTime.Now;
+        HouseholdGroup.UserId = userId;
+        HouseholdGroup.HouseholdId = Household.Id;
+        HouseholdGroup.CreatedBy = userId;
+        HouseholdGroup.UpdatedBy = userId;
+        //Set the DateCreated and DateUpdated fields to the current date and time.
+        HouseholdGroup.DateCreated = DateTime.Now;
+        HouseholdGroup.DateUpdated = DateTime.Now;
         context.Household.Add(Household);
+        context.HouseholdGroup.Add(HouseholdGroup);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/households");
     }

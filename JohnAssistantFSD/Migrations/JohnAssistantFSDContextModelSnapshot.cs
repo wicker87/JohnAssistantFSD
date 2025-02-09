@@ -97,7 +97,7 @@ namespace JohnAssistantFSD.Migrations
                         {
                             Id = "3781efa7-66dc-47f0-860f-e506d04102e4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9e943990-4622-4667-9fdd-d2653f3c1550",
+                            ConcurrencyStamp = "2966ce05-e18e-4e57-90bb-0c5c2f950052",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -105,11 +105,101 @@ namespace JohnAssistantFSD.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN4quI5mtUV+uEEmBFS8GZz62Y+LMDCDwTtKABIEbDF5+0AtHNBIO3G5DCT8m/Cr2g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHiLeI25RUg8CAiKFIcKqwHs0Srq9VRtiURjF0VBhLYFt+jb0d0mf8dy9B8Wh0R14w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "0671cd38-74ab-415c-8ae8-055d59f802a6",
+                            SecurityStamp = "4ba8fed5-8075-4585-93d2-d5f4f4ab856e",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
+                        },
+                        new
+                        {
+                            Id = "9ebd2118-39da-4440-a42e-0b574bf2da25",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "bced8bbd-e2e9-49b9-81cb-f5f396354785",
+                            Email = "adamtan@localhost.com",
+                            EmailConfirmed = true,
+                            FirstName = "Adam",
+                            LastName = "Tan",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADAMTAN@LOCALHOST.COM",
+                            NormalizedUserName = "ADAMTAN@LOCALHOST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAELHd6bU45z1B3RabJrV1W+vdKoNZulkWKexnkFobz1oON5S4eqcvEFfMn/DrGKCBUw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "0ebc8991-b2dc-40f9-a023-1de8b0ec7bec",
+                            TwoFactorEnabled = false,
+                            UserName = "adamtan@localhost.com"
+                        },
+                        new
+                        {
+                            Id = "44dc068a-13ca-4b8e-b776-72e2bcd06509",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "79f0cbc0-816c-4285-82e4-1bbae1a8ec95",
+                            Email = "johntan@localhost.com",
+                            EmailConfirmed = true,
+                            FirstName = "John",
+                            LastName = "Tan",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "JOHN@LOCALHOST.COM",
+                            NormalizedUserName = "JOHN@LOCALHOST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFjrVV1cmZpaKBG6DO6ABCytzuclsu856N7QISbEfg9++vBRarXMNJ1OTvUrNdHfWw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "98835c72-bb52-44f5-b205-825488a4f1ee",
+                            TwoFactorEnabled = false,
+                            UserName = "johntan@localhost.com"
+                        },
+                        new
+                        {
+                            Id = "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "113d3d42-b2a5-4bef-b261-77a230b23d87",
+                            Email = "pl@localhost.com",
+                            EmailConfirmed = true,
+                            FirstName = "p",
+                            LastName = "l",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PL@LOCALHOST.COM",
+                            NormalizedUserName = "PL@LOCALHOST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEyPqaNjdqOGWJNXJJzh4eQJsdL6UrCXCuiPrNppmYQlGy+INnPEXDOvsYqCWfmzfQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f78cbd8c-91a9-421f-8a1e-c3a02c6e3c3b",
+                            TwoFactorEnabled = false,
+                            UserName = "adamtan@localhost.com"
+                        },
+                        new
+                        {
+                            Id = "66211897-8c20-473c-98cc-1172351a5176",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "57e6b744-b310-4061-95cc-b00f7f20c91a",
+                            Email = "aj@localhost.com",
+                            EmailConfirmed = true,
+                            FirstName = "A",
+                            LastName = "J",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "AJ@LOCALHOST.COM",
+                            NormalizedUserName = "AJ@LOCALHOST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJJRrMzcMCU84sfqnqQUSzSvzycOC4v89Vmln3ssMYA5QNVgZmFGqfCRpTFnisQ8TA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "1732203a-19e3-409f-b097-c3308f971d63",
+                            TwoFactorEnabled = false,
+                            UserName = "aj@localhost.com"
+                        },
+                        new
+                        {
+                            Id = "fb318f66-6952-43f0-be25-d7b8fbf1e42f",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "6a87761d-b88e-4a64-9e25-05273954d12b",
+                            Email = "pt@localhost.com",
+                            EmailConfirmed = true,
+                            FirstName = "P",
+                            LastName = "T",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PT@LOCALHOST.COM",
+                            NormalizedUserName = "PT@LOCALHOST.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDlSmZbWuRNRSzjtVhYqCuWNDGjDVybzI5T9owkYtRn4ri/Zm+su9/LK73yyrI3V0A==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "738f23af-e087-4f67-b07d-ae81f9fa942f",
+                            TwoFactorEnabled = false,
+                            UserName = "pt@localhost.com"
                         });
                 });
 
@@ -130,7 +220,7 @@ namespace JohnAssistantFSD.Migrations
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EventId")
+                    b.Property<int?>("EventsId")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
@@ -216,6 +306,35 @@ namespace JohnAssistantFSD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Household");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3041),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3255),
+                            Name = "Wombat",
+                            UpdatedBy = "System"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3261),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3261),
+                            Name = "Kang",
+                            UpdatedBy = "System"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3263),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3264),
+                            Name = "bat",
+                            UpdatedBy = "System"
+                        });
                 });
 
             modelBuilder.Entity("JohnAssistantFSD.Domain.HouseholdGroup", b =>
@@ -247,6 +366,68 @@ namespace JohnAssistantFSD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HouseholdGroup");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3530),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3531),
+                            HouseholdId = 1,
+                            UpdatedBy = "System",
+                            UserId = "44dc068a-13ca-4b8e-b776-72e2bcd06509"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3546),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3547),
+                            HouseholdId = 1,
+                            UpdatedBy = "System",
+                            UserId = "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3549),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3549),
+                            HouseholdId = 2,
+                            UpdatedBy = "System",
+                            UserId = "9ebd2118-39da-4440-a42e-0b574bf2da25"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3551),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3551),
+                            HouseholdId = 2,
+                            UpdatedBy = "System",
+                            UserId = "fb318f66-6952-43f0-be25-d7b8fbf1e42f"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3553),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3553),
+                            HouseholdId = 3,
+                            UpdatedBy = "System",
+                            UserId = "44dc068a-13ca-4b8e-b776-72e2bcd06509"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedBy = "System",
+                            DateCreated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3555),
+                            DateUpdated = new DateTime(2025, 2, 9, 23, 21, 20, 100, DateTimeKind.Local).AddTicks(3556),
+                            HouseholdId = 3,
+                            UpdatedBy = "System",
+                            UserId = "66211897-8c20-473c-98cc-1172351a5176"
+                        });
                 });
 
             modelBuilder.Entity("JohnAssistantFSD.Domain.SListGroup", b =>
@@ -517,6 +698,31 @@ namespace JohnAssistantFSD.Migrations
                         {
                             UserId = "3781efa7-66dc-47f0-860f-e506d04102e4",
                             RoleId = "ad2bcf0c-20db-474f-8407-5a6b159518ba"
+                        },
+                        new
+                        {
+                            UserId = "9ebd2118-39da-4440-a42e-0b574bf2da25",
+                            RoleId = "dc46b121-84af-43a2-ab9b-b4387466ff60"
+                        },
+                        new
+                        {
+                            UserId = "44dc068a-13ca-4b8e-b776-72e2bcd06509",
+                            RoleId = "dc46b121-84af-43a2-ab9b-b4387466ff60"
+                        },
+                        new
+                        {
+                            UserId = "e42c14c2-c24e-46e5-bbf7-12f4feb65ae6",
+                            RoleId = "43688613-3972-4b3c-a932-d528efe25e08"
+                        },
+                        new
+                        {
+                            UserId = "66211897-8c20-473c-98cc-1172351a5176",
+                            RoleId = "43688613-3972-4b3c-a932-d528efe25e08"
+                        },
+                        new
+                        {
+                            UserId = "fb318f66-6952-43f0-be25-d7b8fbf1e42f",
+                            RoleId = "43688613-3972-4b3c-a932-d528efe25e08"
                         });
                 });
 
